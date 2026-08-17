@@ -24,14 +24,44 @@ const processQueue = (error, token = null) => {
   pendingRequests = [];
 };
 
+// Automatically clean hardcoded EC2 IP URLs from responses so they route safely over CloudFront HTTPS
 API.interceptors.response.use(
-  (response) => response,
+  (response) => {
+    const fixUrl = (url) => typeof url === 'string' && url.includes('http://54.235.58.181:8080') 
+      ? url.replace('http://54.235.58.181:8080', '') 
+      : url;
+
+    if (response.data) {
+      if (Array.isArray(response.data)) {
+        response.data = response.data.map(item => {
+          if (item?.imageUrl) item.imageUrl = fixUrl(item.imageUrl);
+          if (item?.product?.imageUrl) item.product.imageUrl = fixUrl(item.product.imageUrl);
+          if (item?.cartItems) {
+            item.cartItems = item.cartItems.map(ci => {
+              if (ci?.product?.imageUrl) ci.product.imageUrl = fixUrl(ci.product.imageUrl);
+              return ci;
+            });
+          }
+          return item;
+        });
+      } else if (typeof response.data === 'object') {
+        if (response.data.imageUrl) response.data.imageUrl = fixUrl(response.data.imageUrl);
+        if (response.data.product?.imageUrl) response.data.product.imageUrl = fixUrl(response.data.product.imageUrl);
+        if (response.data.cartItems) {
+          response.data.cartItems = response.data.cartItems.map(ci => {
+            if (ci?.product?.imageUrl) ci.product.imageUrl = fixUrl(ci.product.imageUrl);
+            return ci;
+          });
+        }
+      }
+    }
+    return response;
+  },
   async (error) => {
     const originalRequest = error.config;
     const isAuthRoute = originalRequest?.url?.includes('/auth/');
 
-
-      if ((error.response?.status === 401 || error.response?.status === 403) && !originalRequest._retry && !isAuthRoute) {
+    if ((error.response?.status === 401 || error.response?.status === 403) && !originalRequest._retry && !isAuthRoute) {
       if (isRefreshing) {
         return new Promise((resolve, reject) => {
           pendingRequests.push({ resolve, reject });
@@ -84,3 +114,8 @@ API.interceptors.response.use(
 );
 
 export default API;
+
+export const fixImageUrl = (url) => {
+  if (!url) return "";
+  return url.replace("http://54.235.58.181:8080", "");
+};
