@@ -1,7 +1,7 @@
 import axios from 'axios';
 
 const API = axios.create({
-  baseURL: 'http://54.235.58.181:8080/api',
+  baseURL: '/api',
 });
 
 API.interceptors.request.use((config) => {
@@ -55,7 +55,7 @@ API.interceptors.response.use(
       }
 
       try {
-        const res = await axios.post('http://54.235.58.181:8080/api/auth/refresh-token', {
+        const res = await axios.post('/api/auth/refresh-token', {
           refreshToken,
         });
         const newToken = res.data.token;
