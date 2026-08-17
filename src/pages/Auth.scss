@@ -1,0 +1,23 @@
+@use '../styles/variables' as v;
+@use '../styles/mixins' as m;
+
+.auth-page {
+  min-height:88vh; @include m.flex-center;
+  background:
+    radial-gradient(circle at 18% 20%, rgba(37,99,235,.08), transparent 55%),
+    radial-gradient(circle at 82% 80%, rgba(245,158,11,.06), transparent 55%),
+    v.$bg;
+  padding:50px 20px;
+}
+.auth-card { @include m.card; padding:44px; width:100%; max-width:440px; box-shadow: v.$shadow-lg; }
+.auth-head { text-align:center; margin-bottom:28px; h2 { font-size:24px; margin-bottom:5px; } p { font-size:13.5px; color: v.$muted; } }
+.auth-form .field { margin-bottom:16px; }
+.password-row { position:relative; display:flex; align-items:center; .field-input { padding-right:46px; } }
+.eye-btn {
+  position:absolute; right:13px; background:none; border:none; cursor:pointer;
+  color: v.$muted; display:flex; align-items:center; transition: v.$fast;
+  &:hover { color: v.$brand; }
+}
+.rules-box { background: v.$bg; border:1.5px solid v.$border; border-radius:v.$r-sm; padding:12px 14px; margin-top:8px; display:flex; flex-direction:column; gap:7px; }
+.rule-row { display:flex; align-items:center; gap:8px; font-size:12px; font-weight:600; &.ok { color: v.$success; } &.no { color: v.$muted-soft; } }
+.auth-switch { text-align:center; font-size:13px; color: v.$muted; margin-top:18px; a { color: v.$brand; font-weight:800; } }

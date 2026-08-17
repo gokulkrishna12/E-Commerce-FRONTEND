@@ -1,0 +1,133 @@
+@use '../styles/variables' as v;
+@use '../styles/mixins' as m;
+
+.pay-page { padding:40px 64px; max-width:1300px; margin:0 auto; }
+.pay-back { margin-bottom:22px; padding:0; }
+.pay-layout { display:flex; gap:26px; flex-wrap:wrap; align-items:flex-start; }
+
+.pay-card { @include m.card; padding:32px; flex:1; min-width:340px; box-shadow: v.$shadow-sm; }
+.pay-card-head { display:flex; align-items:center; gap:10px; color: v.$brand; margin-bottom:6px; h2 { font-size:19px; color: v.$ink; } }
+.pay-secure-row { display:flex; align-items:center; gap:6px; font-size:11.5px; color: v.$success; font-weight:700; margin-bottom:22px; }
+
+.pay-preview {
+  background: linear-gradient(135deg, v.$brand, v.$brand-dark);
+  border-radius: v.$r-lg; padding:22px; color:#fff; margin-bottom:22px;
+  box-shadow: v.$shadow-brand;
+}
+.pay-preview-top { display:flex; justify-content:space-between; align-items:center; margin-bottom:26px; font-weight:800; font-size:15px; }
+.pay-chip { width:32px; height:24px; border-radius:5px; background: rgba(255,255,255,.3); }
+.pay-preview-number { font-family:monospace; font-size:19px; letter-spacing:2.5px; margin-bottom:22px; }
+.pay-preview-bottom {
+  display:flex; justify-content:space-between;
+  p { font-size:9.5px; opacity:.7; text-transform:uppercase; letter-spacing:.07em; }
+  span { font-size:13.5px; font-weight:700; }
+}
+
+.pay-error {
+  display:flex; align-items:center; gap:7px;
+  background: v.$danger-soft; color: v.$danger; padding:10px 14px;
+  border-radius: v.$r-sm; font-size:12.5px; font-weight:600; margin-bottom:14px;
+}
+.pay-row { display:flex; gap:14px; .field { flex:1; } }
+.pay-test-hint {
+  background: v.$success-soft; border:1px solid rgba(22,163,74,.25);
+  border-radius: v.$r-sm; padding:10px 13px; margin-bottom:20px;
+  p { font-size:11.5px; color: v.$success; font-family: monospace; font-weight:600; }
+}
+.pay-submit { padding:15px; font-size:15px; }
+
+.pay-summary { width:305px; flex-shrink:0; @include m.card; padding:24px; position:sticky; top:88px; h3 { font-size:17px; padding-bottom:14px; border-bottom:1px solid v.$border; margin-bottom:15px; } }
+.pay-summary-items { display:flex; flex-direction:column; gap:8px; margin-bottom:12px; }
+.pay-summary-item {
+  display:flex; justify-content:space-between; font-size:12.5px; color: v.$ink-3; font-weight:600;
+  span:first-child { flex:1; @include m.truncate(1); }
+  span:last-child { font-weight:800; color: v.$ink; margin-left:8px; }
+}
+.pay-summary-divider { border:none; border-top:1px solid v.$border; margin:12px 0; }
+.pay-summary-row { display:flex; justify-content:space-between; font-size:13.5px; color: v.$ink-3; font-weight:600; margin-bottom:9px; }
+.pay-free { color: v.$success; font-weight:800; }
+.pay-summary-total { font-size:16px; font-weight:800; color: v.$ink; padding-top:8px; border-top:1px solid v.$border; }
+.pay-address {
+  margin-top:16px; background: v.$bg; border-radius: v.$r-sm; padding:12px 14px;
+  p { display:flex; align-items:center; gap:6px; font-size:11.5px; font-weight:700; color: v.$ink-3; margin-bottom:4px; }
+  span { font-size:12.5px; color: v.$muted; }
+}
+
+.pay-status-card {
+  @include m.card; max-width:440px; margin:60px auto; padding:48px 32px;
+  text-align:center; box-shadow: v.$shadow-lg;
+  h2 { font-size:21px; margin-bottom:6px; }
+  p { font-size:13.5px; color: v.$muted; }
+}
+.pay-spinner {
+  width:46px; height:46px; border:3.5px solid v.$border; border-top-color: v.$brand;
+  border-radius:50%; margin:0 auto 20px; animation: pay-spin .8s linear infinite;
+}
+@keyframes pay-spin { to { transform: rotate(360deg); } }
+.pay-steps { display:inline-flex; flex-direction:column; gap:11px; margin-top:22px; text-align:left; }
+.pay-step { display:flex; align-items:center; gap:10px; font-size:12.5px; font-weight:600; color: v.$ink-3; }
+.pay-step-dot { width:7px; height:7px; border-radius:50%; background: v.$brand; flex-shrink:0; }
+
+.pay-success-icon { color: v.$success; margin-bottom:12px; }
+.pay-success-amount { font-family: v.$font-display; font-size:32px; font-weight:800; color: v.$ink; margin:6px 0; }
+
+@media (max-width:860px) {
+  .pay-page { padding:24px 20px; }
+  .pay-summary { width:100%; position:static; }
+}
+
+// ── Payment method selector ──
+.method-list { display: flex; flex-direction: column; gap: 10px; margin-top: 6px; }
+.method-option {
+  display: flex; align-items: center; gap: 14px;
+  padding: 16px 18px;
+  background: v.$bg;
+  border: 1.5px solid v.$border;
+  border-radius: v.$r-md;
+  cursor: pointer;
+  text-align: left;
+  transition: v.$fast;
+  font-family: v.$font;
+  &:hover { border-color: v.$brand; background: v.$brand-soft; }
+}
+.method-icon {
+  width: 42px; height: 42px; border-radius: v.$r-sm;
+  display: flex; align-items: center; justify-content: center;
+  flex-shrink: 0;
+}
+.method-icon-card { background: #eef2ff; color: #4338ca; }
+.method-icon-upi  { background: #ecfdf5; color: #059669; }
+.method-icon-cod  { background: v.$accent-soft; color: v.$accent-dark; }
+.method-text {
+  flex: 1; display: flex; flex-direction: column; gap: 2px;
+  strong { font-size: 14px; color: v.$ink; }
+  span { font-size: 12px; color: v.$muted; }
+}
+.method-arrow { color: v.$muted-soft; flex-shrink: 0; }
+
+// ── Professional banking-style card (intentionally NOT brand brown) ──
+.bank-card {
+  background: linear-gradient(135deg, #0f1b2d 0%, #1a2942 55%, #0f1b2d 100%);
+  border-radius: v.$r-lg;
+  padding: 22px;
+  color: #e8ecf3;
+  margin-bottom: 20px;
+  position: relative;
+  overflow: hidden;
+  box-shadow: 0 14px 34px rgba(15,27,45,.4);
+  &::after {
+    content: '';
+    position: absolute; top: -60%; right: -20%;
+    width: 220px; height: 220px; border-radius: 50%;
+    background: radial-gradient(circle, rgba(255,255,255,.08), transparent 70%);
+  }
+}
+.bank-card-top { display: flex; justify-content: space-between; align-items: center; margin-bottom: 26px; position: relative; z-index: 1; }
+.bank-card-brand { font-size: 13px; font-weight: 700; letter-spacing: .06em; color: #cbd5e1; text-transform: uppercase; }
+.bank-card-chip { width: 34px; height: 25px; border-radius: 5px; background: linear-gradient(135deg, #d4af6a, #f0d999); }
+.bank-card-number { font-family: 'Courier New', monospace; font-size: 19px; letter-spacing: 2.5px; font-weight: 600; margin-bottom: 22px; position: relative; z-index: 1; }
+.bank-card-bottom {
+  display: flex; justify-content: space-between; position: relative; z-index: 1;
+  p { font-size: 9px; text-transform: uppercase; letter-spacing: .08em; color: #94a3b8; margin-bottom: 3px; }
+  span { font-size: 13px; font-weight: 700; color: #f1f5f9; }
+}

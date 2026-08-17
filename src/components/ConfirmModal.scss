@@ -1,0 +1,27 @@
+@use '../styles/variables' as v;
+@use '../styles/mixins' as m;
+
+.confirm-overlay {
+  position: fixed; inset: 0; z-index: 3000;
+  background: rgba(11,15,25,.55);
+  backdrop-filter: blur(3px);
+  @include m.flex-center;
+  padding: 20px;
+}
+.confirm-box {
+  background: #fff;
+  border-radius: v.$r-xl;
+  padding: 28px;
+  width: 400px;
+  max-width: 100%;
+  box-shadow: v.$shadow-lg;
+}
+.confirm-head { @include m.flex-between; margin-bottom: 10px; }
+.confirm-head-left {
+  display: flex; align-items: center; gap: 10px;
+  color: v.$accent-dark;
+  h3 { font-size: 17px; color: v.$ink; }
+}
+.confirm-close { background: none; border: none; cursor: pointer; color: v.$muted; }
+.confirm-message { font-size: 13.5px; color: v.$muted; line-height: 1.6; margin-bottom: 22px; }
+.confirm-actions { display: flex; gap: 10px; }

@@ -1,0 +1,77 @@
+@import url('https://fonts.googleapis.com/css2?family=Outfit:wght@500;600;700;800&family=Inter:wght@400;500;600;700;800&display=swap');
+
+// ============================================================
+// GK's ShopEase — Design Tokens
+// ============================================================
+
+// Brand — Coffee Brown 🟤
+$brand:         #7C5738;
+$brand-dark:    #5A3F28;
+$brand-darker:  #3A281A;
+$brand-light:   #C9A374;
+$brand-soft:    #F6EDE2;
+
+// Accent
+$accent:        #f59e0b;
+$accent-dark:   #b45309;
+$accent-soft:   #fffbeb;
+
+// Status
+$success:       #16a34a;
+$success-soft:  #f0fdf4;
+$danger:        #f43f5e;
+$danger-soft:   #fff1f2;
+$warning:       #f59e0b;
+$warning-soft:  #fffbeb;
+$info:          #2563eb;
+$info-soft:     #eff6ff;
+
+// Neutrals
+$ink:           #0b0f19;
+$ink-2:         #1e293b;
+$ink-3:         #475569;
+$muted:         #64748b;
+$muted-soft:    #94a3b8;
+$border:        #e2e8f0;
+$border-2:      #cbd5e1;
+$surface:       #ffffff;
+$bg:            #f8fafc;
+
+// Footer / dark surfaces
+$black:         #05070d;
+$black-2:       #0d111c;
+
+// Category accent map
+$cat-colors: (
+  blue:   (base: #2563eb, tint: #eff6ff, dark: #1d4ed8),
+  pink:   (base: #ec4899, tint: #fdf2f8, dark: #db2777),
+  amber:  (base: #f59e0b, tint: #fffbeb, dark: #b45309),
+  green:  (base: #16a34a, tint: #f0fdf4, dark: #15803d),
+  violet: (base: #7c3aed, tint: #f5f3ff, dark: #6d28d9),
+  coral:  (base: #f97316, tint: #fff7ed, dark: #c2410c),
+);
+
+// Radii
+$r-sm:  8px;
+$r-md:  12px;
+$r-lg:  18px;
+$r-xl:  26px;
+$r-2xl: 34px;
+
+// Shadows
+$shadow-xs: 0 1px 2px rgba(11,15,25,.05);
+$shadow-sm: 0 2px 8px rgba(11,15,25,.06), 0 0 0 1px rgba(11,15,25,.04);
+$shadow-md: 0 8px 24px rgba(11,15,25,.08), 0 0 0 1px rgba(11,15,25,.04);
+$shadow-lg: 0 20px 48px rgba(11,15,25,.12);
+$shadow-brand:    0 10px 28px rgba(124,87,56,.32);
+$shadow-brand-lg: 0 18px 44px rgba(124,87,56,.42);
+
+// Motion
+$ease: cubic-bezier(.16,1,.3,1);
+$fast: .15s $ease;
+$med:  .25s $ease;
+$slow: .45s $ease;
+
+// Type
+$font:         'Inter', system-ui, -apple-system, sans-serif;
+$font-display: 'Outfit', 'Inter', sans-serif;

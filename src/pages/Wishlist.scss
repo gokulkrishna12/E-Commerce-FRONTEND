@@ -1,0 +1,38 @@
+@use '../styles/variables' as v;
+@use '../styles/mixins' as m;
+
+.wishlist-head { margin-bottom: 24px; h1 { font-size: 28px; } }
+
+.wishlist-grid {
+  display: grid;
+  grid-template-columns: repeat(auto-fill, minmax(230px, 1fr));
+  gap: 18px;
+}
+.wishlist-card {
+  @include m.card;
+  overflow: hidden;
+  transition: v.$med;
+  &:hover { box-shadow: v.$shadow-md; transform: translateY(-3px); }
+}
+.wishlist-img {
+  position: relative;
+  aspect-ratio: 1 / 1;
+  background: v.$brand-soft;
+  img { width: 100%; height: 100%; object-fit: cover; }
+}
+.wishlist-remove {
+  position: absolute; top: 10px; right: 10px;
+  width: 32px; height: 32px;
+  background: rgba(255,255,255,.9);
+  border: none; border-radius: 50%;
+  color: v.$danger;
+  display: flex; align-items: center; justify-content: center;
+  cursor: pointer;
+  box-shadow: v.$shadow-sm;
+  transition: v.$fast;
+  &:hover { background: v.$danger; color: #fff; }
+}
+.wishlist-info { padding: 14px 16px; }
+.wishlist-info h3 { font-size: 14.5px; margin: 8px 0 10px; }
+.wishlist-bottom { display: flex; align-items: center; justify-content: space-between; }
+.wishlist-actions { display: flex; gap: 6px; }

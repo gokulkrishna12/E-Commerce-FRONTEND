@@ -1,0 +1,54 @@
+@use '../styles/mixins' as m;
+
+.camera-overlay {
+  position: fixed; inset: 0; z-index: 4000;
+  background: rgba(5,7,13,.85);
+  backdrop-filter: blur(4px);
+  @include m.flex-center;
+  padding: 20px;
+}
+.camera-box {
+  background: #0b0f19;
+  border-radius: 26px;
+  width: 420px; max-width: 100%;
+  overflow: hidden;
+  box-shadow: 0 20px 48px rgba(0,0,0,.5);
+}
+.camera-head {
+  display: flex; align-items: center; justify-content: space-between;
+  padding: 16px 18px;
+  color: #fff; font-size: 14px; font-weight: 700;
+  span { display: flex; align-items: center; gap: 8px; }
+}
+.camera-close { background: none; border: none; color: rgba(255,255,255,.6); cursor: pointer; }
+.camera-stage {
+  position: relative;
+  width: 100%; aspect-ratio: 3/4;
+  background: #000;
+  display: flex; align-items: center; justify-content: center;
+  overflow: hidden;
+}
+.camera-video {
+  display: none;
+  width: 100%; height: 100%; object-fit: cover;
+  &.is-visible { display: block; }
+}
+.camera-preview-img { width: 100%; height: 100%; object-fit: cover; }
+.camera-msg { color: rgba(255,255,255,.7); font-size: 13px; text-align: center; padding: 0 24px; }
+.camera-msg-error {
+  display: flex; flex-direction: column; align-items: center; gap: 8px;
+  color: #fca5b1;
+  p { font-weight: 700; font-size: 14px; color: #fff; margin: 0; }
+  span { font-size: 12px; color: rgba(255,255,255,.55); }
+}
+.camera-actions {
+  display: flex; align-items: center; justify-content: center; gap: 16px;
+  padding: 18px; background: #0b0f19;
+}
+.camera-shutter {
+  width: 60px; height: 60px; border-radius: 50%;
+  background: #fff; border: 4px solid rgba(255,255,255,.3);
+  cursor: pointer; transition: transform .15s ease;
+  &:hover { transform: scale(1.06); }
+  &:active { transform: scale(0.94); }
+}

@@ -1,0 +1,94 @@
+@use '../styles/variables' as v;
+@use '../styles/mixins' as m;
+
+.admin-head { display:flex; align-items:center; gap:12px; margin-bottom:24px; color: v.$brand; h1{ font-size:26px; color:v.$ink; } }
+
+.admin-stats { display:flex; gap:16px; flex-wrap:wrap; margin-bottom:26px; }
+.stat-card {
+  @include m.card; flex:1; min-width:160px; padding:22px 24px;
+  display:flex; flex-direction:column; gap:5px; position:relative; overflow:hidden;
+  &::after { content:''; position:absolute; top:0; left:0; right:0; height:3px; transform:scaleX(0); transition: v.$med; transform-origin:left; }
+  &:hover::after { transform:scaleX(1); }
+  &:hover { box-shadow: v.$shadow-md; transform:translateY(-2px); }
+}
+.stat-primary::after { background: v.$brand; }
+.stat-accent::after  { background: v.$accent; }
+.stat-success::after { background: v.$success; }
+.stat-icon { width:38px; height:38px; border-radius:v.$r-sm; @include m.flex-center; margin-bottom:2px; }
+.stat-primary .stat-icon { background: v.$brand-soft; color: v.$brand; }
+.stat-accent  .stat-icon { background: v.$accent-soft; color: v.$accent-dark; }
+.stat-success .stat-icon { background: v.$success-soft; color: v.$success; }
+.stat-value { font-family: v.$font-display; font-size:27px; font-weight:800; }
+.stat-label { font-size:11.5px; font-weight:700; color: v.$muted; text-transform:uppercase; letter-spacing:.05em; }
+
+.admin-tabs { display:flex; gap:6px; margin-bottom:20px; }
+.admin-tab {
+  @include m.btn-reset; padding:9px 18px; border-radius:v.$r-sm;
+  background: v.$surface; border:1.5px solid v.$border;
+  font-size:13px; font-weight:700; color: v.$ink-3;
+  transition: v.$fast;
+  &:hover { border-color: v.$brand; color: v.$brand; }
+  &.is-active { background: v.$brand; border-color: v.$brand; color:#fff; box-shadow: v.$shadow-brand; }
+}
+.admin-add-btn { margin-bottom:18px; }
+
+.form-card { @include m.card; padding:28px 30px; margin-bottom:22px; box-shadow: v.$shadow-sm; h3 { font-size:16px; padding-bottom:15px; border-bottom:1px solid v.$border; margin-bottom:18px; } }
+.form-grid { display:grid; grid-template-columns:1fr 1fr; gap:14px; margin-bottom:18px; }
+.preview-box { margin-top:10px; display:flex; align-items:center; gap:12px; img { width:64px; height:64px; object-fit:cover; border-radius:v.$r-sm; border:1.5px solid v.$border; } }
+.preview-text { display:flex; align-items:center; gap:5px; font-size:12px; font-weight:700; color: v.$success; }
+.preview-checking { font-size:12px; font-weight:600; color: v.$muted; }
+.preview-error { display:flex; align-items:center; gap:6px; font-size:12px; font-weight:700; color: v.$danger; }
+.form-btns { display:flex; gap:10px; }
+
+.products-grid-cols { grid-template-columns: 60px 2fr 1.2fr 1fr 1fr 90px; }
+.orders-grid-cols   { grid-template-columns: 60px 1.4fr 0.7fr 1.7fr 0.9fr 1fr 90px; }
+.table-img { width:44px; height:44px; border-radius:v.$r-sm; overflow:hidden; background: v.$brand-soft; @include m.flex-center; img { width:100%; height:100%; object-fit:cover; } }
+.table-product-name { font-weight:700; color: v.$ink; }
+.table-extra-note { font-size: 10.5px; color: v.$muted; margin-top: 2px; }
+.table-customer-name { font-weight:700; font-size:13.5px; color: v.$ink; }
+.table-customer-email { font-size:11.5px; color: v.$muted; }
+.stock-badge { padding:4px 10px; border-radius:99px; font-size:11px; font-weight:800; &.in { background: v.$success-soft; color: v.$success; } &.out { background: v.$danger-soft; color: v.$danger; } }
+.table-actions { display:flex; gap:6px; }
+
+@media (max-width:900px) {
+  .form-grid { grid-template-columns:1fr; }
+  .products-grid-cols, .orders-grid-cols { grid-template-columns: 50px 1.5fr 1fr; }
+}
+
+// ── Low stock stat card ──
+.stat-lowstock::after { background: v.$danger; }
+.stat-lowstock .stat-icon { background: v.$danger-soft; color: v.$danger; }
+
+// ── Low stock badge on product rows ──
+.stock-badge.low { background: v.$warning-soft; color: v.$accent-dark; }
+
+// ── Revenue chart ──
+.chart-card {
+  background: linear-gradient(160deg, #0f1b2d 0%, #142235 100%);
+  border-radius: v.$r-lg;
+  padding: 22px 26px; margin-bottom: 26px;
+  box-shadow: 0 12px 30px rgba(15,27,45,.25);
+}
+.chart-title {
+  display: flex; align-items: center; gap: 8px;
+  font-size: 15px; font-weight: 800; color: #e8ecf3;
+  margin-bottom: 16px;
+}
+.chart-empty { font-size: 13.5px; color: rgba(255,255,255,.5); padding: 30px 0; text-align: center; }
+// ── Order status dropdown ──
+.status-select {
+  padding: 6px 10px;
+  border-radius: 8px;
+  border: 1.5px solid v.$border;
+  background: v.$surface;
+  font-size: 11.5px;
+  font-weight: 800;
+  color: v.$ink-3;
+  cursor: pointer;
+  font-family: inherit;
+  &:focus { outline: none; border-color: v.$brand; }
+}
+
+// ── Product image upload button ──
+.hidden-file-input { display: none; }
+.upload-img-btn { margin-top: 8px; align-self: flex-start; }

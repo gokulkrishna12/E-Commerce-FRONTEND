@@ -1,0 +1,104 @@
+@use '../styles/variables' as v;
+@use '../styles/mixins' as m;
+
+.nav {
+  position: sticky; top: 0; z-index: 900;
+  background: linear-gradient(120deg, v.$brand-darker 0%, v.$brand-dark 55%, v.$brand 100%);
+  border-bottom: 1px solid rgba(255,255,255,.12);
+  box-shadow: 0 6px 20px rgba(20,12,6,.28);
+}
+.nav-inner {
+  max-width: 1400px; margin: 0 auto;
+  height: 66px; padding: 0 40px;
+  display: flex; align-items: center; justify-content: space-between;
+}
+.nav-logo { display: flex; align-items: center; gap: 10px; text-decoration: none; }
+.nav-logo-mark {
+  width: 36px; height: 36px; border-radius: 10px;
+  @include m.flex-center;
+  background: rgba(255,255,255,.16);
+  border: 1px solid rgba(255,255,255,.3);
+  color: #fff; font-family: v.$font-display; font-weight: 800; font-size: 13px;
+}
+.nav-logo-text {
+  font-family: v.$font-display; font-size: 17.5px; font-weight: 600;
+  color: rgba(255,255,255,.85);
+  em { font-style: normal; font-weight: 800; color: #fff; }
+}
+.nav-toggle { display: none; background: none; border: none; color: #fff; cursor: pointer; }
+
+.nav-links { display: flex; align-items: center; gap: 8px; }
+
+.nav-link {
+  --nav-accent: #{v.$brand-light};
+  position: relative;
+  display: flex; align-items: center; gap: 6px;
+  padding: 9px 16px;
+  border-radius: 10px;
+  color: rgba(255,255,255,.85);
+  font-size: 13.5px; font-weight: 700;
+  text-decoration: none;
+  background: rgba(255,255,255,.08);
+  border: 1px solid rgba(255,255,255,.14);
+  transition: all .18s ease;
+
+  &:hover {
+    background: rgba(255,255,255,.16);
+    border-color: rgba(255,255,255,.25);
+    color: #fff;
+  }
+
+  &.active {
+    background: rgba(255,255,255,.2);
+    border-color: var(--nav-accent);
+    color: #fff;
+    box-shadow: 0 0 0 1px var(--nav-accent) inset, 0 4px 12px rgba(0,0,0,.2);
+  }
+}
+
+.nav-user {
+  display: flex; align-items: center; gap: 7px;
+  background: rgba(255,255,255,.12);
+  border: 1px solid rgba(255,255,255,.22);
+  padding: 8px 16px; border-radius: 99px;
+  color: #fff; font-size: 13px; font-weight: 700;
+  text-decoration: none; cursor: pointer;
+  transition: background .15s ease;
+  &:hover { background: rgba(255,255,255,.2); }
+}
+
+.nav-logout {
+  display: flex; align-items: center; gap: 6px;
+  padding: 9px 18px; border-radius: 10px;
+  background: #e11d48;
+  border: 1px solid rgba(255,255,255,.2);
+  color: #fff; font-size: 13px; font-weight: 800; cursor: pointer;
+  box-shadow: 0 4px 12px rgba(225,29,72,.35);
+  transition: all .18s ease;
+  &:hover { background: #be123c; transform: translateY(-1px); }
+}
+
+.nav-cta {
+  padding: 9px 20px; border-radius: 10px;
+  background: #fff; color: v.$brand-dark;
+  font-size: 13.5px; font-weight: 800;
+  text-decoration: none;
+  box-shadow: 0 4px 12px rgba(0,0,0,.2);
+  transition: all .18s ease;
+  &:hover { transform: translateY(-1px); box-shadow: 0 8px 18px rgba(0,0,0,.28); }
+}
+
+@media (max-width: 860px) {
+  .nav-toggle { display: flex; }
+  .nav-links {
+    position: absolute; top: 66px; left: 0; right: 0;
+    flex-direction: column; align-items: stretch; gap: 8px;
+    padding: 16px 20px 20px;
+    background: linear-gradient(120deg, v.$brand-darker, v.$brand-dark);
+    max-height: 0; overflow: hidden; opacity: 0;
+    transition: all .25s ease;
+    &.is-open { max-height: 600px; opacity: 1; padding-top: 16px; }
+  }
+  .nav-link, .nav-cta, .nav-logout, .nav-user { width: 100%; justify-content: flex-start; }
+  .nav-user { justify-content: center; margin: 4px 0; }
+}

@@ -1,0 +1,212 @@
+@use './styles/variables' as v;
+@use './styles/mixins' as m;
+@use 'sass:map';
+
+@import url('https://fonts.googleapis.com/css2?family=Outfit:wght@500;600;700;800&family=Inter:wght@400;500;600;700;800&display=swap');
+
+// ---------- Root tokens exposed for inline JSX color="var(--x)" usage ----------
+:root {
+  --brand: #{v.$brand};
+  --brand-dark: #{v.$brand-dark};
+  --muted: #{v.$muted};
+  --muted-soft: #{v.$muted-soft};
+  --border: #{v.$border};
+  --success: #{v.$success};
+  --danger: #{v.$danger};
+}
+
+// ---------- Reset ----------
+*, *::before, *::after { margin:0; padding:0; box-sizing:border-box; }
+html { scroll-behavior: smooth; }
+body {
+  font-family: v.$font;
+  background: v.$bg;
+  color: v.$ink;
+  line-height: 1.6;
+  -webkit-font-smoothing: antialiased;
+}
+h1,h2,h3,h4,h5,h6 {
+  font-family: v.$font-display;
+  font-weight: 700;
+  color: v.$ink;
+  line-height: 1.2;
+  letter-spacing: -.02em;
+}
+a { text-decoration:none; color:inherit; }
+button, input, select, textarea { font-family: v.$font; }
+img { display:block; max-width:100%; }
+
+::-webkit-scrollbar { width:6px; }
+::-webkit-scrollbar-track { background: v.$bg; }
+::-webkit-scrollbar-thumb { background: v.$brand; border-radius:99px; }
+
+// ---------- App shell ----------
+.app-shell { display:flex; flex-direction:column; min-height:100vh; }
+.app-main  { flex:1; }
+
+// ---------- Shared page wrapper ----------
+.page-shell { padding: 40px 64px; max-width:1400px; margin:0 auto; width:100%; }
+
+.eyebrow {
+  display:inline-block;
+  font-size:12px; font-weight:800;
+  color: v.$brand;
+  text-transform:uppercase; letter-spacing:.09em;
+  margin-bottom:6px;
+}
+
+// ---------- Buttons ----------
+.btn {
+  @include m.btn-reset;
+  padding: 12px 24px;
+  border-radius: v.$r-md;
+  font-size: 14px; font-weight:700;
+  transition: v.$med;
+}
+.btn-primary {
+  background: linear-gradient(135deg, v.$brand, v.$brand-dark);
+  color:#fff;
+  box-shadow: v.$shadow-brand;
+  &:hover:not(:disabled) { transform:translateY(-2px); box-shadow: v.$shadow-brand-lg; }
+  &:disabled { opacity:.5; cursor:not-allowed; transform:none; box-shadow:none; }
+}
+.btn-outline {
+  background: v.$surface;
+  border: 1.5px solid v.$border-2;
+  color: v.$ink-2;
+  &:hover { border-color: v.$brand; color: v.$brand; background: v.$brand-soft; }
+}
+.btn-ghost {
+  background: transparent;
+  color: v.$brand;
+  padding-left:0; padding-right:0;
+  &:hover { color: v.$brand-dark; }
+}
+.btn-danger {
+  background: v.$danger-soft;
+  border: 1.5px solid rgba(244,63,94,.3);
+  color: v.$danger;
+  &:hover { background: #ffe0e6; }
+}
+.btn-sm { padding: 8px 14px; font-size:12.5px; border-radius: v.$r-sm; }
+.btn-block { width:100%; justify-content:center; }
+
+// ---------- Tag / category badge ----------
+.tag {
+  display:inline-block;
+  font-size:11px; font-weight:800;
+  padding:4px 11px; border-radius:99px;
+  letter-spacing:.02em;
+  background: v.$brand-soft; color: v.$brand-dark;
+}
+@each $name, $vals in v.$cat-colors {
+  $key: "" + $name;
+
+  .tag[data-color="#{$key}"] {
+    background: map.get($vals, tint);
+    color: map.get($vals, dark);
+  }
+
+  .feature-icon[data-color="#{$key}"] {
+    background: map.get($vals, tint);
+    color: map.get($vals, dark);
+  }
+
+  .cat-avatar[data-color="#{$key}"] {
+    background: map.get($vals, tint);
+  }
+
+  .cat-wash-#{$key} {
+    background: linear-gradient(
+      180deg,
+      rgba(0, 0, 0, 0) 30%,
+      map.get($vals, dark) 145%
+    );
+  }
+}
+// ---------- Price ----------
+.price-tag {
+  font-family: v.$font-display;
+  font-weight:800; color: v.$ink;
+  letter-spacing:-.02em;
+}
+
+// ---------- Empty / loading state ----------
+.state-block {
+  display:flex; flex-direction:column; align-items:center;
+  text-align:center; gap:10px;
+  padding: 70px 20px;
+  h3 { font-size:18px; }
+  p  { color: v.$muted; font-size:13.5px; max-width:320px; }
+}
+.state-icon {
+  width:56px; height:56px; border-radius:50%;
+  @include m.flex-center;
+  background: v.$brand-soft; color: v.$brand;
+  margin-bottom:4px;
+}
+
+// ---------- Form fields ----------
+.field { display:flex; flex-direction:column; gap:6px; margin-bottom:16px; }
+.field-full { grid-column: 1 / -1; }
+.field-label {
+  font-size:12.5px; font-weight:700; color: v.$ink-3;
+  display:flex; align-items:center; gap:5px;
+}
+.field-input, .field-select, .field-textarea {
+  padding:12px 15px;
+  background: v.$bg;
+  border:1.5px solid v.$border;
+  border-radius: v.$r-sm;
+  font-size:14px; color: v.$ink;
+  outline:none; width:100%;
+  transition: v.$fast;
+  &:focus { border-color: v.$brand; background:#fff; box-shadow: 0 0 0 3px rgba(37,99,235,.12); }
+  &::placeholder { color: v.$muted-soft; }
+}
+.field-textarea { resize:none; font-family:v.$font; }
+.field-input.is-valid   { border-color: v.$success; background: v.$success-soft; }
+.field-input.is-invalid { border-color: v.$danger;  background: v.$danger-soft; }
+.field-hint {
+  font-size:11.5px; font-weight:600; display:flex; align-items:center; gap:5px;
+  &.error   { color: v.$danger; }
+  &.success { color: v.$success; }
+}
+.inline-code {
+  background: v.$border; padding:2px 6px; border-radius:5px;
+  font-size:11.5px; color: v.$brand-dark; font-family: monospace;
+}
+
+// ---------- Status pill ----------
+.status-pill { padding:5px 13px; border-radius:99px; font-size:11.5px; font-weight:800; letter-spacing:.03em; white-space:nowrap; }
+.status-pending   { background: v.$warning-soft; color: v.$accent-dark; }
+.status-confirmed { background: v.$info-soft;    color: v.$brand-dark; }
+.status-shipped   { background: #f5f3ff;         color:#6d28d9; }
+.status-delivered { background: v.$success-soft; color: v.$success; }
+.status-cancelled { background: v.$danger-soft;  color: v.$danger; }
+
+// ---------- Tables ----------
+.table-card { background:v.$surface; border:1px solid v.$border; border-radius:v.$r-lg; overflow:hidden; }
+.table-header {
+  display:grid; padding:13px 22px;
+  background: linear-gradient(135deg, v.$ink-2, v.$ink);
+  color: rgba(255,255,255,.6);
+  font-size:11px; font-weight:700; text-transform:uppercase; letter-spacing:.07em;
+}
+.table-row {
+  display:grid; padding:15px 22px;
+  border-bottom:1px solid v.$border;
+  align-items:center; font-size:13.5px;
+  transition: v.$fast;
+  &:last-child { border-bottom:none; }
+  &:hover { background: v.$bg; }
+}
+.table-empty { text-align:center; padding:48px; color:v.$muted; font-size:14px; font-weight:600; }
+
+// ---------- Utilities ----------
+.u-mt-sm { margin-top:10px; }
+.u-mt-md { margin-top:18px; }
+
+@media (max-width: 860px) {
+  .page-shell { padding: 24px 20px; }
+}
