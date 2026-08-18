@@ -37,9 +37,10 @@ const Products = () => {
   const fetchProducts = async () => {
     try {
       const res = await API.get("/products");
-      setProducts(res.data);
+      setProducts(Array.isArray(res.data) ? res.data : []);
     } catch {
       toast.error("Failed to load products");
+      setProducts([]);
     } finally {
       setLoading(false);
     }
@@ -48,7 +49,9 @@ const Products = () => {
   const fetchWishlist = async () => {
     try {
       const res = await API.get("/wishlist");
-      setWishlistIds(new Set(res.data.map((i) => i.product.id)));
+      if (Array.isArray(res.data)) {
+        setWishlistIds(new Set(res.data.map((i) => i.product?.id).filter(Boolean)));
+      }
     } catch {}
   };
 
@@ -93,9 +96,10 @@ const Products = () => {
     else setSearchParams({ category: categoryName });
   };
 
-  const filtered = products.filter((p) => {
+  const validProducts = Array.isArray(products) ? products : [];
+  const filtered = validProducts.filter((p) => {
     const matchCategory = activeCategory === "All" || p.category === activeCategory;
-    const matchSearch = p.name.toLowerCase().includes(search.toLowerCase());
+    const matchSearch = (p.name || "").toLowerCase().includes(search.toLowerCase());
     return matchCategory && matchSearch;
   });
 

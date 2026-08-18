@@ -14,7 +14,8 @@ const Cart = () => {
   const navigate = useNavigate();
 
   useEffect(() => {
-    if (!user) { navigate("/login"); return; }
+    const token = localStorage.getItem("token");
+    if (!token && !user) { navigate("/login"); return; }
     fetchCart();
   }, [user]);
 
@@ -30,6 +31,7 @@ const Cart = () => {
   };
 
   const removeItem = async (itemId) => {
+    if (!itemId) return;
     try {
       await API.delete(`/cart/remove/${itemId}`);
       toast.success("Removed from cart");
@@ -39,10 +41,16 @@ const Cart = () => {
     }
   };
 
-  const cartItems = cart?.cartItems || [];
-  const total = cartItems.reduce(
-    (sum, item) => sum + (item?.product?.price ?? 0) * (item?.quantity ?? 0), 0
-  );
+  // 🛡️ Handles cart.cartItems, cart.items, or a top-level array
+  const rawItems = cart?.cartItems || cart?.items || (Array.isArray(cart) ? cart : []);
+  const cartItems = Array.isArray(rawItems) ? rawItems : [];
+
+  const total = cartItems.reduce((sum, item) => {
+    const p = item?.product || item || {};
+    const price = Number(p?.price || item?.price || 0);
+    const qty = Number(item?.quantity || 1);
+    return sum + price * qty;
+  }, 0);
 
   const goToPayment = () => {
     if (!address.trim()) {
@@ -75,30 +83,37 @@ const Cart = () => {
       ) : (
         <div className="cart-layout">
           <div className="cart-items">
-            {cartItems.map((item) => (
-              <div key={item.id} className="cart-item">
-                <div className="cart-item-img">
-                  {item.product.imageUrl ? (
-                    <img src={item.product.imageUrl} alt={item.product.name} />
-                  ) : (
-                    <FiShoppingCart size={26} color="var(--muted-soft)" />
-                  )}
+            {cartItems.map((item, idx) => {
+              const product = item?.product || item || {};
+              const itemId = item?.id || product?.id || idx;
+              const qty = Number(item?.quantity || 1);
+              const price = Number(product?.price || item?.price || 0);
+
+              return (
+                <div key={`cart-${itemId}-${idx}`} className="cart-item">
+                  <div className="cart-item-img">
+                    {product?.imageUrl ? (
+                      <img src={product.imageUrl} alt={product?.name || "Product"} />
+                    ) : (
+                      <FiShoppingCart size={26} color="var(--muted-soft)" />
+                    )}
+                  </div>
+                  <div className="cart-item-info">
+                    <h3>{product?.name || "Product"}</h3>
+                    <p className="price-tag cart-item-price">₹{price}</p>
+                    <p className="cart-item-qty">Quantity: {qty}</p>
+                  </div>
+                  <div className="cart-item-right">
+                    <p className="price-tag cart-item-total">
+                      ₹{(price * qty).toFixed(2)}
+                    </p>
+                    <button onClick={() => removeItem(item?.id || itemId)} className="btn btn-danger btn-sm cart-remove">
+                      <FiTrash2 size={15} />
+                    </button>
+                  </div>
                 </div>
-                <div className="cart-item-info">
-                  <h3>{item.product.name}</h3>
-                  <p className="price-tag cart-item-price">₹{item.product.price}</p>
-                  <p className="cart-item-qty">Quantity: {item.quantity}</p>
-                </div>
-                <div className="cart-item-right">
-                  <p className="price-tag cart-item-total">
-                    ₹{(item.product.price * item.quantity).toFixed(2)}
-                  </p>
-                  <button onClick={() => removeItem(item.id)} className="btn btn-danger btn-sm cart-remove">
-                    <FiTrash2 size={15} />
-                  </button>
-                </div>
-              </div>
-            ))}
+              );
+            })}
           </div>
 
           <div className="cart-summary">

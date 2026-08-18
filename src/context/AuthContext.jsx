@@ -5,24 +5,39 @@ const AuthContext = createContext();
 
 export const AuthProvider = ({ children }) => {
   const [user, setUser] = useState(null);
-  const [token, setToken] = useState(localStorage.getItem("token") || null);
+  const [token, setToken] = useState(() => {
+    const saved = localStorage.getItem("token");
+    return saved && saved !== "undefined" && saved !== "null" ? saved : null;
+  });
 
   useEffect(() => {
     const savedUser = localStorage.getItem("user");
-    if (savedUser) setUser(JSON.parse(savedUser));
+    if (savedUser && savedUser !== "undefined" && savedUser !== "null") {
+      try {
+        setUser(JSON.parse(savedUser));
+      } catch {
+        localStorage.removeItem("user");
+      }
+    }
   }, []);
 
   const login = (userData, accessToken, refreshToken) => {
     setUser(userData);
-    setToken(accessToken);
-    localStorage.setItem("token", accessToken);
-    localStorage.setItem("refreshToken", refreshToken);
-    localStorage.setItem("user", JSON.stringify(userData));
+    if (accessToken && accessToken !== "undefined") {
+      setToken(accessToken);
+      localStorage.setItem("token", accessToken);
+    }
+    if (refreshToken && refreshToken !== "undefined") {
+      localStorage.setItem("refreshToken", refreshToken);
+    }
+    if (userData) {
+      localStorage.setItem("user", JSON.stringify(userData));
+    }
   };
 
   const logout = () => {
     const refreshToken = localStorage.getItem("refreshToken");
-    if (refreshToken) {
+    if (refreshToken && refreshToken !== "undefined") {
       API.post("/auth/logout", { refreshToken }).catch(() => {});
     }
     setUser(null);

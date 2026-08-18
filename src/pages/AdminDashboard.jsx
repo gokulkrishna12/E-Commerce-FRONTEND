@@ -22,6 +22,11 @@ const STATUS_CLASS = {
 
 const EMPTY_FORM = { name: "", description: "", price: "", stock: "", category: "", imageUrl: "" };
 
+const resolveImageUrl = (url) => {
+  if (!url) return "";
+  return url.replace(/^http:\/\/54\.235\.58\.181:8080/, "");
+};
+
 const AdminDashboard = () => {
   const [products, setProducts] = useState([]);
   const [orders, setOrders] = useState([]);
@@ -49,7 +54,7 @@ const AdminDashboard = () => {
       const testImg = new Image();
       testImg.onload = () => setImgStatus("ok");
       testImg.onerror = () => setImgStatus("error");
-      testImg.src = form.imageUrl;
+      testImg.src = resolveImageUrl(form.imageUrl);
     }, 500);
     return () => clearTimeout(timer);
   }, [form.imageUrl]);
@@ -70,7 +75,6 @@ const AdminDashboard = () => {
     setShowForm(true);
   };
 
-  // ✅ NEW — pre-fills the form with an existing product's values
   const openEditForm = (product) => {
     setEditingProductId(product.id);
     setForm({
@@ -91,7 +95,6 @@ const AdminDashboard = () => {
     setShowForm(false);
   };
 
-  // ✅ NEW — direct file upload for product images
   const handleProductImageSelect = async (e) => {
     const file = e.target.files[0];
     if (!file) return;
@@ -113,14 +116,9 @@ const AdminDashboard = () => {
     }
   };
 
-  // ✅ RENAMED from addProduct — now handles both add AND edit
   const saveProduct = async () => {
     if (!form.name || !form.price || !form.stock || !form.category) {
       toast.error("Please fill all required fields");
-      return;
-    }
-    if (form.imageUrl.trim() && imgStatus !== "ok") {
-      toast.error("That image path couldn't be found — please check it");
       return;
     }
     try {
@@ -139,7 +137,6 @@ const AdminDashboard = () => {
     }
   };
 
-  // ✅ NEW — admin manually moves order status
   const updateOrderStatus = async (orderId, status) => {
     try {
       await API.put(`/orders/status/${orderId}`, { status });
@@ -185,9 +182,6 @@ const AdminDashboard = () => {
       }
       setConfirmAction(null);
     } catch (err) {
-      // ✅ NEW — the backend already blocks deleting a product that's referenced by
-      // a cart or an order, but its message is generic. Show a clearer, specific
-      // one for that case instead of whatever raw text the backend sent.
       if (confirmAction.type === "deleteProduct") {
         toast.error("This product is ordered by someone — please check, cancel, and delete the order to remove this product.");
       } else {
@@ -201,7 +195,6 @@ const AdminDashboard = () => {
   const totalRevenue = orders.reduce((s, o) => s + (o.totalAmount || 0), 0);
   const lowStockCount = products.filter((p) => p.stock <= LOW_STOCK_THRESHOLD).length;
 
-  // ✅ NEW — groups revenue by day for the chart, skipping cancelled orders
   const getChartData = () => {
     const grouped = {};
     orders.forEach((o) => {
@@ -215,7 +208,6 @@ const AdminDashboard = () => {
 
   return (
     <div className="page-shell">
-
       <ConfirmModal
         open={!!confirmAction}
         title={confirmAction?.title}
@@ -251,7 +243,6 @@ const AdminDashboard = () => {
           <span className="stat-label">Low stock (≤{LOW_STOCK_THRESHOLD})</span>
         </div>
       </div>
-
 
       <div className="chart-card">
         <h3 className="chart-title"><FiTrendingUp size={16} /> Revenue overview</h3>
@@ -326,9 +317,7 @@ const AdminDashboard = () => {
                 </div>
 
                 <div className="field field-full">
-                  <label className="field-label">
-                    Image path * — place the image inside <code className="inline-code">public/images/</code>, or upload one below
-                  </label>
+                  <label className="field-label">Image path or upload photo</label>
                   <input className="field-input" placeholder="e.g. /images/iphone15.jpg" value={form.imageUrl}
                     onChange={(e) => setForm({ ...form, imageUrl: e.target.value })} />
 
@@ -353,7 +342,7 @@ const AdminDashboard = () => {
                       {imgStatus === "checking" && <p className="preview-checking">Checking image…</p>}
                       {imgStatus === "ok" && (
                         <>
-                          <img src={form.imageUrl} alt="preview" />
+                          <img src={resolveImageUrl(form.imageUrl)} alt="preview" />
                           <p className="preview-text"><FiCheckCircle size={13} /> Image found</p>
                         </>
                       )}
@@ -388,29 +377,41 @@ const AdminDashboard = () => {
             {products.length === 0 ? (
               <div className="table-empty">No products yet — add your first one above.</div>
             ) : (
-              products.map((p) => (
-                <div key={p.id} className="table-row products-grid-cols">
-                  <div className="table-img">
-                    {p.imageUrl
-                      ? <img src={p.imageUrl} alt={p.name} onError={(e) => { e.target.style.display = "none"; }} />
-                      : <FiPackage size={18} color="var(--muted-soft)" />}
+              products.map((p) => {
+                const pImg = resolveImageUrl(p.imageUrl);
+                return (
+                  <div key={p.id} className="table-row products-grid-cols">
+                    <div className="table-img">
+                      {pImg ? (
+                        <img
+                          src={pImg}
+                          alt={p.name}
+                          onError={(e) => {
+                            e.target.onerror = null;
+                            e.target.src = "https://placehold.co/50x50?text=Product";
+                          }}
+                        />
+                      ) : (
+                        <FiPackage size={18} color="var(--muted-soft)" />
+                      )}
+                    </div>
+                    <span className="table-product-name">{p.name}</span>
+                    <span className="tag" data-color={getCategoryColor(p.category)}>{p.category}</span>
+                    <span className="price-tag">₹{p.price}</span>
+                    <span className={`stock-badge ${p.stock === 0 ? "out" : p.stock <= LOW_STOCK_THRESHOLD ? "low" : "in"}`}>
+                      {p.stock === 0 ? "Out of stock" : p.stock <= LOW_STOCK_THRESHOLD ? `Low: ${p.stock} left` : `${p.stock} left`}
+                    </span>
+                    <div className="table-actions">
+                      <button onClick={() => openEditForm(p)} className="btn btn-outline btn-sm" title="Edit product">
+                        <FiEdit2 size={14} />
+                      </button>
+                      <button onClick={() => askDeleteProduct(p)} className="btn btn-danger btn-sm" title="Delete product">
+                        <FiTrash2 size={15} />
+                      </button>
+                    </div>
                   </div>
-                  <span className="table-product-name">{p.name}</span>
-                  <span className="tag" data-color={getCategoryColor(p.category)}>{p.category}</span>
-                  <span className="price-tag">₹{p.price}</span>
-                  <span className={`stock-badge ${p.stock === 0 ? "out" : p.stock <= LOW_STOCK_THRESHOLD ? "low" : "in"}`}>
-                    {p.stock === 0 ? "Out of stock" : p.stock <= LOW_STOCK_THRESHOLD ? `Low: ${p.stock} left` : `${p.stock} left`}
-                  </span>
-                  <div className="table-actions">
-                    <button onClick={() => openEditForm(p)} className="btn btn-outline btn-sm" title="Edit product">
-                      <FiEdit2 size={14} />
-                    </button>
-                    <button onClick={() => askDeleteProduct(p)} className="btn btn-danger btn-sm" title="Delete product">
-                      <FiTrash2 size={15} />
-                    </button>
-                  </div>
-                </div>
-              ))
+                );
+              })
             )}
           </div>
         </div>
@@ -425,18 +426,30 @@ const AdminDashboard = () => {
             <div className="table-empty">No orders yet.</div>
           ) : (
             orders.map((o) => {
-              const items = o.orderItems || [];
-              const firstItem = items[0];
-              const extraCount = items.length - 1;
+              const rawItems = o.orderItems || o.items || [];
+              const firstItem = rawItems[0] || {};
+              const product = firstItem.product || firstItem;
+              const extraCount = rawItems.length - 1;
+              const orderImg = resolveImageUrl(product?.imageUrl || firstItem?.imageUrl);
+
               return (
                 <div key={o.id} className="table-row orders-grid-cols">
                   <div className="table-img">
-                    {firstItem?.product?.imageUrl
-                      ? <img src={firstItem.product.imageUrl} alt={firstItem.product.name} onError={(e) => { e.target.style.display = "none"; }} />
-                      : <FiPackage size={18} color="var(--muted-soft)" />}
+                    {orderImg ? (
+                      <img
+                        src={orderImg}
+                        alt={product?.name || "Product"}
+                        onError={(e) => {
+                          e.target.onerror = null;
+                          e.target.src = "https://placehold.co/50x50?text=Item";
+                        }}
+                      />
+                    ) : (
+                      <FiPackage size={18} color="var(--muted-soft)" />
+                    )}
                   </div>
                   <div>
-                    <span className="table-product-name">{firstItem?.product?.name || "—"}</span>
+                    <span className="table-product-name">{product?.name || "—"}</span>
                     {extraCount > 0 && <p className="table-extra-note">+{extraCount} more item{extraCount !== 1 ? "s" : ""}</p>}
                   </div>
                   <span className="table-product-name">#{o.id}</span>

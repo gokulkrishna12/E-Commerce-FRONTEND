@@ -10,16 +10,41 @@ const Profile = () => {
   const { user, updateUser } = useAuth();
   const navigate = useNavigate();
 
-  const [name, setName] = useState(user?.name || "");
+  const [name, setName] = useState("");
+  const [email, setEmail] = useState("");
+  const [role, setRole] = useState("Customer");
   const [savingName, setSavingName] = useState(false);
 
   const [pwForm, setPwForm] = useState({ currentPassword: "", newPassword: "" });
   const [savingPw, setSavingPw] = useState(false);
 
   useEffect(() => {
-    if (!user) { navigate("/login"); return; }
-    setName(user.name);
-  }, [user]);
+    const token = localStorage.getItem("token");
+    if (!token) {
+      navigate("/login");
+      return;
+    }
+    fetchProfile();
+  }, []);
+
+  const fetchProfile = async () => {
+    try {
+      const res = await API.get("/users/profile");
+      const data = res.data || {};
+      setName(data.name || data.fullName || user?.name || user?.fullName || "");
+      setEmail(data.email || user?.email || "");
+      // 🛡️ Fixed: Checks for both "ROLE_ADMIN" and "ADMIN"
+      setRole(data.role === "ROLE_ADMIN" || data.role === "ADMIN" || user?.role === "ROLE_ADMIN" || user?.role === "ADMIN" ? "Admin" : "Customer");
+      updateUser(data);
+    } catch {
+      if (user) {
+        setName(user.name || user.fullName || "");
+        setEmail(user.email || "");
+        // 🛡️ Fixed: Checks for both "ROLE_ADMIN" and "ADMIN"
+        setRole(user.role === "ROLE_ADMIN" || user.role === "ADMIN" ? "Admin" : "Customer");
+      }
+    }
+  };
 
   const saveName = async () => {
     if (name.trim().length < 3) {
@@ -29,7 +54,7 @@ const Profile = () => {
     setSavingName(true);
     try {
       const res = await API.put("/users/profile", { name });
-      updateUser({ name: res.data.name });
+      updateUser({ name: res.data?.name || name, fullName: res.data?.name || name });
       toast.success("Profile updated!");
     } catch (err) {
       toast.error(err.response?.data?.error || "Failed to update profile");
@@ -59,8 +84,6 @@ const Profile = () => {
     }
   };
 
-  if (!user) return null;
-
   return (
     <div className="page-shell profile-page">
       <div className="profile-head">
@@ -77,18 +100,18 @@ const Profile = () => {
 
           <div className="field">
             <label className="field-label">Full name</label>
-            <input className="field-input" value={name} onChange={(e) => setName(e.target.value)} />
+            <input className="field-input" value={name} onChange={(e) => setName(e.target.value)} placeholder="Enter full name" />
           </div>
 
           <div className="field">
             <label className="field-label">Email</label>
-            <input className="field-input" value={user.email} disabled />
+            <input className="field-input" value={email} disabled />
             <span className="field-hint-static">Email can't be changed</span>
           </div>
 
           <div className="field">
             <label className="field-label">Account type</label>
-            <input className="field-input" value={user.role === "ROLE_ADMIN" ? "Admin" : "Customer"} disabled />
+            <input className="field-input" value={role} disabled />
           </div>
 
           <button onClick={saveName} className="btn btn-primary" disabled={savingName}>

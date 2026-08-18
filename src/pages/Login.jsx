@@ -41,15 +41,57 @@ const Login = () => {
     setLoading(true);
     try {
       const res = await API.post("/auth/login", form);
-      login(
-        { name: res.data.name, email: res.data.email, role: res.data.role },
-        res.data.token,
-        res.data.refreshToken
-      );
-      toast.success(`Welcome back, ${res.data.name}`);
-      navigate("/products");
-    } catch {
-      toast.error("Invalid email or password");
+      const data = res.data || {};
+      
+      // 🛡️ Search across all token property formats
+      const token =
+        data.token ||
+        data.jwt ||
+        data.accessToken ||
+        data.jwtToken ||
+        data.access_token ||
+        data.data?.token ||
+        data.data?.accessToken;
+
+      const refreshToken = data.refreshToken || data.data?.refreshToken || "";
+
+      const rawUser = data.user || data.data?.user || data;
+
+      const rawRole =
+        rawUser.role ||
+        data.role ||
+        (Array.isArray(rawUser.roles) ? rawUser.roles[0] : null) ||
+        (Array.isArray(data.roles) ? data.roles[0] : "") ||
+        "";
+
+      const isAdmin = String(rawRole).toUpperCase().includes("ADMIN");
+      const resolvedRole = isAdmin ? "ROLE_ADMIN" : "ROLE_CUSTOMER";
+
+      const resolvedName =
+        rawUser.name ||
+        rawUser.fullName ||
+        data.name ||
+        data.fullName ||
+        form.email.split("@")[0];
+
+      const userData = {
+        id: rawUser.id || data.id,
+        name: resolvedName,
+        fullName: resolvedName,
+        email: rawUser.email || data.email || form.email,
+        role: resolvedRole,
+      };
+
+      login(userData, token, refreshToken);
+      toast.success(`Welcome back, ${resolvedName}!`);
+
+      if (isAdmin) {
+        navigate("/admin");
+      } else {
+        navigate("/products");
+      }
+    } catch (err) {
+      toast.error(err.response?.data?.error || err.response?.data?.message || "Invalid email or password");
     } finally {
       setLoading(false);
     }
@@ -76,10 +118,14 @@ const Login = () => {
               onBlur={() => setTouched({ ...touched, email: true })}
             />
             {isInvalid("email") && (
-              <span className="field-hint error"><FiAlertTriangle size={13} /> {validators.email.message}</span>
+              <span className="field-hint error">
+                <FiAlertTriangle size={13} /> {validators.email.message}
+              </span>
             )}
             {isValid("email") && (
-              <span className="field-hint success"><FiCheckCircle size={13} /> Looks good</span>
+              <span className="field-hint success">
+                <FiCheckCircle size={13} /> Looks good
+              </span>
             )}
           </div>
 
@@ -94,19 +140,31 @@ const Login = () => {
                 onChange={(e) => setForm({ ...form, password: e.target.value })}
                 onBlur={() => setTouched({ ...touched, password: true })}
               />
-              <button type="button" onClick={() => setShowPassword(!showPassword)} className="eye-btn">
+              <button
+                type="button"
+                onClick={() => setShowPassword(!showPassword)}
+                className="eye-btn"
+              >
                 {showPassword ? <FiEyeOff size={18} /> : <FiEye size={18} />}
               </button>
             </div>
             {isInvalid("password") && (
-              <span className="field-hint error"><FiAlertTriangle size={13} /> {validators.password.message}</span>
+              <span className="field-hint error">
+                <FiAlertTriangle size={13} /> {validators.password.message}
+              </span>
             )}
             {isValid("password") && (
-              <span className="field-hint success"><FiCheckCircle size={13} /> Looks good</span>
+              <span className="field-hint success">
+                <FiCheckCircle size={13} /> Looks good
+              </span>
             )}
           </div>
 
-          <button onClick={handleSubmit} className="btn btn-primary btn-block" disabled={loading || !allValid}>
+          <button
+            onClick={handleSubmit}
+            className="btn btn-primary btn-block"
+            disabled={loading || !allValid}
+          >
             {loading ? "Logging in…" : <>Login <FiLogIn size={16} /></>}
           </button>
 

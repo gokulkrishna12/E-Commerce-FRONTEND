@@ -19,12 +19,18 @@ const Navbar = () => {
 
   const linkClass = ({ isActive }) => `nav-link ${isActive ? "active" : ""}`;
 
-  // ✅ Reads ?category= while on /products, so the Products link
-  // glows with that category's own color
   const params = new URLSearchParams(location.search);
   const activeCategoryName = location.pathname === "/products" ? params.get("category") : null;
   const activeCategoryHex = activeCategoryName ? CATEGORY_HEX[getCategoryColor(activeCategoryName)] : null;
   const productsLinkStyle = activeCategoryHex ? { "--nav-accent": activeCategoryHex } : undefined;
+
+  // 🛡️ Checks both "ADMIN", "ROLE_ADMIN", and case-insensitive variations
+  const isAdmin =
+    user?.role === "ROLE_ADMIN" ||
+    user?.role === "ADMIN" ||
+    String(user?.role || "").toUpperCase().includes("ADMIN");
+
+  const displayName = user?.name || user?.fullName || user?.email?.split("@")[0] || "Account";
 
   return (
     <header className="nav">
@@ -54,14 +60,17 @@ const Navbar = () => {
               <NavLink to="/orders" className={linkClass} onClick={() => setMenuOpen(false)}>
                 <FiPackage size={16} /> Orders
               </NavLink>
-              {user.role === "ROLE_ADMIN" && (
+
+              {isAdmin && (
                 <NavLink to="/admin" className={linkClass} onClick={() => setMenuOpen(false)}>
                   <FiGrid size={16} /> Dashboard
                 </NavLink>
               )}
+
               <Link to="/profile" className="nav-user" onClick={() => setMenuOpen(false)}>
-                <FiUser size={14} /><span>{user.name}</span>
+                <FiUser size={14} /><span>{displayName}</span>
               </Link>
+
               <button onClick={handleLogout} className="nav-logout">
                 <FiLogOut size={15} /> Logout
               </button>
