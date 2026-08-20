@@ -48,7 +48,6 @@ const ProductDetail = () => {
     if (product) fetchRelated();
   }, [product]);
 
-  // ✅ NEW — lightbox: Esc to close, lock background scroll while open
   useEffect(() => {
     document.body.style.overflow = lightboxOpen ? "hidden" : "";
     if (!lightboxOpen) return;
@@ -72,11 +71,16 @@ const ProductDetail = () => {
   };
 
   const addToCart = async () => {
+    if (!user) {
+      toast.error("Please login to add to cart");
+      navigate("/login");
+      return;
+    }
     try {
       await API.post("/cart/add", { productId: product.id, quantity: qty });
       toast.success("Added to cart");
     } catch {
-      toast.error("Login to add to cart");
+      toast.error("Failed to add to cart");
     }
   };
 
@@ -115,7 +119,6 @@ const ProductDetail = () => {
     }
   };
 
-  // ✅ Shared upload logic used by BOTH gallery picker and camera capture
   const uploadImageFile = async (file) => {
     if (!file.type.startsWith("image/")) { toast.error("Please select an image file"); return; }
     if (file.size > 5 * 1024 * 1024) { toast.error("Image must be under 5MB"); return; }
@@ -193,7 +196,6 @@ const ProductDetail = () => {
 
   return (
     <div className="page-shell">
-
       <ConfirmModal
         open={!!deleteReviewId}
         title="Delete your review?"

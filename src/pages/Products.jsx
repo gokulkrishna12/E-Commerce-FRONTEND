@@ -56,6 +56,11 @@ const Products = () => {
   };
 
   const addToCart = async (productId) => {
+    if (!user) {
+      toast.error("Please login to add to cart");
+      navigate("/login");
+      return;
+    }
     try {
       await API.post("/cart/add", { productId, quantity: 1 });
       toast.success("Added to cart");
